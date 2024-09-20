@@ -9,6 +9,9 @@ class DeclarativePageView<T> extends StatefulWidget {
     required this.onChange,
     required this.pages,
     required this.builder,
+    this.physics,
+    this.duration = const Duration(milliseconds: 350),
+    this.curve = Curves.easeOut,
   });
 
   final double viewportFraction;
@@ -23,19 +26,23 @@ class DeclarativePageView<T> extends StatefulWidget {
 
   final Widget Function(BuildContext context, T value) builder;
 
+  final ScrollPhysics? physics;
+
+  final Duration duration;
+
+  final Curve curve;
+
   @override
   State<DeclarativePageView> createState() => _DeclarativePageViewState<T>();
 }
 
 class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
   late var page = widget.pages.indexOf(widget.value); // initial page
-
   var isAnimating = false;
-
   var userInteracting = false;
+
   void userIsInteracting(bool x) {
     setState(() => userInteracting = x);
-    print("pointerIsDown($x)");
   }
 
   late final controller =
@@ -45,7 +52,7 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
     final p = controller.page!.clamp(0, widget.pages.length).round();
     final v = widget.pages.elementAtOrNull(p);
 
-    if (didRegister == false) {
+    if (didRegister == false && controller.positions.isNotEmpty) {
       isScrollingNotifier.addListener(onScrollingUpdated);
       didRegister = true;
     }
@@ -72,8 +79,8 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
     final i = widget.pages.indexOf(x);
     controller.animateToPage(
       i,
-      duration: const Duration(seconds: 1),
-      curve: Curves.easeOut,
+      duration: widget.duration,
+      curve: widget.curve,
     );
   }
 

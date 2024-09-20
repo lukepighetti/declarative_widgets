@@ -1,4 +1,6 @@
 import 'package:declarative_widgets/declarative_page_view.dart';
+import 'package:example/pages_view.dart';
+import 'package:example/text_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,52 +15,34 @@ class ExampleApp extends StatefulWidget {
 }
 
 class _ExampleAppState extends State<ExampleApp> {
-  var page = _ExamplePage.one;
+  var value = ExampleItems.pages;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'declarative_widgets',
       home: Scaffold(
-        body: Column(
-          children: [
-            SafeArea(
-              minimum: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
-                    onPressed: () => setState(() => page = _ExamplePage.one),
-                  ),
-                  Text(page.name),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: () => setState(() => page = _ExamplePage.two),
-                  ),
-                ],
+        body: DeclarativePageView(
+          value: value,
+          onChange: (x) => setState(() => value = x),
+          pages: ExampleItems.values,
+          builder: (context, x) => switch (x) {
+            ExampleItems.pages => const PagesView(),
+            ExampleItems.text => const TextView(),
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: ExampleItems.values.indexOf(value),
+          onTap: (i) {
+            setState(() => value = ExampleItems.values[i]);
+            //
+          },
+          items: [
+            for (final x in ExampleItems.values)
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.code),
+                label: x.name,
               ),
-            ),
-            Expanded(
-              child: DeclarativePageView(
-                value: page,
-                onChange: (x) => setState(() => page = x),
-                pages: _ExamplePage.values,
-                builder: (context, value) {
-                  return switch (value) {
-                    _ExamplePage.one => Center(
-                        child: Text(value.name),
-                      ),
-                    _ExamplePage.two => Center(
-                        child: Text(value.name),
-                      ),
-                    _ExamplePage.three => Center(
-                        child: Text(value.name),
-                      ),
-                  };
-                },
-              ),
-            ),
           ],
         ),
       ),
@@ -66,8 +50,7 @@ class _ExampleAppState extends State<ExampleApp> {
   }
 }
 
-enum _ExamplePage {
-  one,
-  two,
-  three,
+enum ExampleItems {
+  pages,
+  text,
 }

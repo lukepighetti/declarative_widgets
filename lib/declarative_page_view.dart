@@ -4,7 +4,7 @@ class DeclarativePageView<T> extends StatefulWidget {
   const DeclarativePageView({
     super.key,
     this.viewportFraction = 1,
-    this.conflictResolution = ConflictResolution.user,
+    // this.conflictResolution = ConflictResolution.user,
     required this.value,
     required this.onChange,
     required this.pages,
@@ -13,7 +13,7 @@ class DeclarativePageView<T> extends StatefulWidget {
 
   final double viewportFraction;
 
-  final ConflictResolution conflictResolution;
+  // final ConflictResolution conflictResolution;
 
   final T value;
 
@@ -44,13 +44,26 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
   void onControllerUpdated() {
     final p = controller.page!.clamp(0, widget.pages.length).round();
     final v = widget.pages.elementAtOrNull(p);
+
+    if (didRegister == false) {
+      isScrollingNotifier.addListener(onScrollingUpdated);
+      didRegister = true;
+    }
+
     if (v == null) return;
     if (p != page) {
       page = p;
-
-      /// updating this during fling is causing onValueUpdated to trigger
-      /// TODO: get fling blocking time
       widget.onChange(v);
+    }
+  }
+
+  late final isScrollingNotifier = controller.position.isScrollingNotifier;
+  var didRegister = false;
+
+  void onScrollingUpdated() {
+    final scrolling = isScrollingNotifier.value;
+    if (scrolling == false) {
+      userInteracting = false;
     }
   }
 
@@ -79,6 +92,7 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
   @override
   void dispose() {
     controller.dispose();
+    isScrollingNotifier.removeListener(onScrollingUpdated);
     super.dispose();
   }
 
@@ -100,7 +114,7 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
   }
 }
 
-enum ConflictResolution {
-  user,
-  animation,
-}
+// enum ConflictResolution {
+//   user,
+//   animation,
+// }

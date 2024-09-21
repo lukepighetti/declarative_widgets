@@ -1,7 +1,4 @@
 library declarative_widgets;
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+export 'declarative_page_view.dart';
+export 'declarative_text_field.dart';

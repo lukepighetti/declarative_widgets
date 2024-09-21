@@ -120,8 +120,3 @@ class _DeclarativePageViewState<T> extends State<DeclarativePageView<T>> {
     );
   }
 }
-
-// enum ConflictResolution {
-//   user,
-//   animation,
-// }
